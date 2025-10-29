@@ -13,6 +13,7 @@ class ReposViewHolder(private val binding: FragmentRepoitemBinding) :
     }
 }
 
+
 class ReposAdapter: RecyclerView.Adapter<ReposViewHolder>() {
     override fun getItemCount(): Int = 3
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReposViewHolder {
