@@ -18,7 +18,6 @@
             android:src="@drawable/ic_launcher_foreground"
             android:layout_gravity="center"
             />
-        <!--//LAYOUT DEL NOMBRE-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -28,6 +27,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
@@ -35,20 +35,22 @@
                     android:padding="8dp"
                     android:textStyle="bold"
                     />
+
                 <TextView
                     android:id="@+id/repo_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/test_text"
+                    android:text="@string/test_test"
                     android:padding="8dp"
-                    />
-        </LinearLayout>
 
-<!--//LAYOUT DE LA DESCRIPCION-->
+                    />
+
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
@@ -56,21 +58,21 @@
                     android:padding="8dp"
                     android:textStyle="bold"
                     />
+
                 <TextView
                     android:id="@+id/repo_description"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/test_text"
+                    android:text="@string/test_test"
                     android:padding="8dp"
+
                     />
-
-        </LinearLayout>
-
-            <!--//LAYOUT DEL LENGUAJE-->
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="120dp"
                     android:layout_height="wrap_content"
@@ -78,16 +80,23 @@
                     android:padding="8dp"
                     android:textStyle="bold"
                     />
+
                 <TextView
                     android:id="@+id/repo_lang"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/test_lang"
                     android:padding="8dp"
+
                     />
 
-        </LinearLayout>
+
+
+
+            </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
+    <!-- TODO: Update blank fragment layout -->
 
 </FrameLayout>
