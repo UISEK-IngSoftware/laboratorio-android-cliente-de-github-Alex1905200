@@ -1,87 +1,138 @@
 package ec.edu.uisek.githubclient
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import ec.edu.uisek.githubclient.databinding.ActivityRepoFormBinding
 import ec.edu.uisek.githubclient.models.Repo
 import ec.edu.uisek.githubclient.models.RepoRequest
+import ec.edu.uisek.githubclient.services.GithubApiService
 import ec.edu.uisek.githubclient.services.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import kotlin.math.log
-
 
 class RepoForm : AppCompatActivity() {
     private lateinit var binding: ActivityRepoFormBinding
+    private val apiService: GithubApiService = RetrofitClient.gitHubApiService
+    private var repoToEdit: Repo? = null // Variable para guardar el repo si estamos editando
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityRepoFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // --- 1. RECUPERAR EL OBJETO 'Repo' COMPLETO (no el ID) ---
+        // MainActivity envía "EXTRA_REPO", así que lo leemos aquí.
+        repoToEdit = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.getSerializableExtra("EXTRA_REPO", Repo::class.java)
+        } else {
+            @Suppress("DEPRECATION")
+            intent.getSerializableExtra("EXTRA_REPO") as? Repo
+        }
+
+        // --- 2. CONFIGURAR VISTA Y BOTONES SEGÚN EL MODO ---
+        if (repoToEdit != null) {
+            // Si recibimos un repo, estamos en MODO EDICIÓN.
+            prepareEditMode(repoToEdit!!)
+        } else {
+            // Si no, estamos en MODO CREACIÓN.
+            prepareCreateMode()
+        }
+
         binding.cancelButton.setOnClickListener { finish() }
-        binding.saveButton.setOnClickListener { createRepo() }
-
-
     }
 
-    private fun validateForm(): Boolean {
-        val repoName = binding.repoNameInput.text.toString()
-        if (repoName.isBlank()) {
-            binding.repoNameInput.error = "El nombre del repositorio es requerido"
-            return false
-        }
-        if (repoName.contains(" ")) {
-            binding.repoNameInput.error = "El nombre del repositorio no puede contener espacios"
-            return false
-        }
-        binding.repoNameInput.error = null
-        return true
 
+    private fun prepareEditMode(repo: Repo) {
+        supportActionBar?.title = "Editar Repositorio"
+        // Asegúrate de que el ID del botón en activity_repo_form.xml sea 'saveButton'
+        binding.saveButton.text = "Actualizar"
+
+        // Llenamos el formulario con los datos del repo.
+        // Asegúrate de que los IDs de los EditText sean 'repoNameInput' y 'repoDescriptionInput'.
+        binding.repoNameInput.setText(repo.name)
+        binding.repoDescriptionInput.setText(repo.description)
+
+        // El botón de guardar AHORA llama a la función de actualizar.
+        binding.saveButton.setOnClickListener { handleUpdate(repo) }
     }
-    private fun createRepo() {
 
-        if (!validateForm()) {
-            return
-        }
+    private fun prepareCreateMode() {
+        supportActionBar?.title = "Nuevo Repositorio"
+        binding.saveButton.text = "Crear"
+        // El botón de guardar llama a la función de crear.
+        binding.saveButton.setOnClickListener { handleCreate() }
+    }
+
+    private fun handleCreate() {
+        if (!validateForm()) return
+
         val repoName = binding.repoNameInput.text.toString().trim()
         val repoDescription = binding.repoDescriptionInput.text.toString().trim()
-
         val repoRequest = RepoRequest(repoName, repoDescription)
-        val apiService = RetrofitClient.gitHubApiService
-        val call = apiService.addRepo(repoRequest)
 
-        call.enqueue(object: Callback<Repo> {
+        // Llamamos a la API para crear el repositorio.
+        apiService.createRepo(repoRequest).enqueue(object : Callback<Repo> {
             override fun onResponse(call: Call<Repo>, response: Response<Repo>) {
                 if (response.isSuccessful) {
                     showMessage("Repositorio creado exitosamente")
                     finish()
                 } else {
-                    val errorMessage = when (response.code()) {
-                        401 -> "No Autorizado"
-                        403 -> "Prohibido"
-                        404 -> "No Encontrado"
-                        else -> "Error ${response.code()}"
-                    }
-                    showMessage("Error: $errorMessage")
+                    showMessage("Error al crear: ${response.code()}")
                 }
             }
-
             override fun onFailure(call: Call<Repo>, t: Throwable) {
-                val errorMsg = "Error al crear el repositorio: ${t.message}"
-                Log.e("RepoForm", errorMsg, t)
-                showMessage(errorMsg)
+                showMessage("Fallo en la conexión: ${t.message}")
             }
         })
-
     }
-    private fun showMessage (message: String) {
+
+    private fun handleUpdate(originalRepo: Repo) {
+        if (!validateForm()) return
+
+        val newName = binding.repoNameInput.text.toString().trim()
+        val newDescription = binding.repoDescriptionInput.text.toString().trim()
+        val repoRequest = RepoRequest(name = newName, description = newDescription)
+
+        // Llamamos a la API para actualizar, usando el nombre del dueño y el nombre original.
+        apiService.updateRepo(originalRepo.owner.login, originalRepo.name, repoRequest)
+            .enqueue(object : Callback<Repo> {
+                override fun onResponse(call: Call<Repo>, response: Response<Repo>) {
+                    if (response.isSuccessful) {
+                        showMessage("Repositorio actualizado exitosamente")
+                        finish()
+                    } else {
+                        // Un error 403 o 404 aquí puede ser por falta de permisos en el token.
+                        showMessage("Error al actualizar: ${response.code()}")
+                        Log.e("RepoForm", "Error body: ${response.errorBody()?.string()}")
+                    }
+                }
+                override fun onFailure(call: Call<Repo>, t: Throwable) {
+                    showMessage("Fallo de conexión al actualizar: ${t.message}")
+                }
+            })
+    }
+
+    private fun validateForm(): Boolean {
+        val repoName = binding.repoNameInput.text.toString()
+        // Limpiamos errores previos.
+        binding.repoNameInput.error = null
+
+        if (repoName.isBlank()) {
+            binding.repoNameInput.error = "El nombre del repositorio es requerido"
+            return false
+        }
+        if (repoName.contains(" ")) {
+            binding.repoNameInput.error = "El nombre no puede contener espacios"
+            return false
+        }
+        return true
+    }
+
+    private fun showMessage(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 }
