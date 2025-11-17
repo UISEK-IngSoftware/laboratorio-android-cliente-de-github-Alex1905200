@@ -55,6 +55,9 @@ class RepoForm : AppCompatActivity() {
         // Asegúrate de que los IDs de los EditText sean 'repoNameInput' y 'repoDescriptionInput'.
         binding.repoNameInput.setText(repo.name)
         binding.repoDescriptionInput.setText(repo.description)
+        binding.repoNameInput.isEnabled = false
+        // Opcional: Cambiamos el color para que se vea claramente que está deshabilitado
+        binding.repoNameInput.alpha = 0.5f
 
         // El botón de guardar AHORA llama a la función de actualizar.
         binding.saveButton.setOnClickListener { handleUpdate(repo) }
@@ -63,6 +66,8 @@ class RepoForm : AppCompatActivity() {
     private fun prepareCreateMode() {
         supportActionBar?.title = "Nuevo Repositorio"
         binding.saveButton.text = "Crear"
+        binding.repoNameInput.isEnabled = true
+        binding.repoNameInput.alpha = 1.0f
         // El botón de guardar llama a la función de crear.
         binding.saveButton.setOnClickListener { handleCreate() }
     }
@@ -93,12 +98,12 @@ class RepoForm : AppCompatActivity() {
     private fun handleUpdate(originalRepo: Repo) {
         if (!validateForm()) return
 
-        val newName = binding.repoNameInput.text.toString().trim()
         val newDescription = binding.repoDescriptionInput.text.toString().trim()
-        val repoRequest = RepoRequest(name = newName, description = newDescription)
+        val repoRequest = RepoRequest(name = originalRepo.name, description = newDescription)
+
 
         // Llamamos a la API para actualizar, usando el nombre del dueño y el nombre original.
-        apiService.updateRepo(originalRepo.owner.login, originalRepo.name, repoRequest)
+        apiService.updateRepo(originalRepo.owner.login,originalRepo.name, repoRequest)
             .enqueue(object : Callback<Repo> {
                 override fun onResponse(call: Call<Repo>, response: Response<Repo>) {
                     if (response.isSuccessful) {
