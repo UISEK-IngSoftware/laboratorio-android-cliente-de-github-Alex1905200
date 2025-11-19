@@ -24,7 +24,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setupRecyclerView()
         setupFab()
         // Eliminamos la llamada a fetchRepositories() y loadRepositories() de aquí
@@ -37,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        // 1. ADAPTACIÓN: Implementamos los listeners 'onEdit' y 'onDelete' al crear el adaptador.
+        // listeners 'onEdit' y 'onDelete' al crear el adaptador.
         reposAdapter = ReposAdapter(
             onEditClicked = { repo ->
                 // Lógica para editar: Llama a la función que abre el formulario de edición.
@@ -51,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         binding.reposRecyclerView.adapter = reposAdapter
     }
 
-    // 2. NUEVA FUNCIÓN: Muestra un diálogo para confirmar la eliminación.
+    //uestra un diálogo para confirmar la eliminación.
     private fun showDeleteConfirmationDialog(repo: Repo) {
         AlertDialog.Builder(this)
             .setTitle("Confirmar eliminación")
@@ -64,10 +63,9 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    // 3. NUEVA FUNCIÓN: Llama a la API para eliminar el repositorio.
+    //Llama a la API para eliminar el repositorio.
     private fun deleteRepository(repo: Repo) {
-        // Asumimos que tu API necesita el nombre del dueño y del repositorio para eliminar.
-        // Si tu modelo 'Repo' no tiene 'owner', necesitarás ajustarlo.
+        //API necesita el nombre del dueño y del repositorio para eliminar.
         val call = apiService.deleteRepo(repo.owner.login, repo.name)
         call.enqueue(object : Callback<Void> {
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
@@ -89,7 +87,6 @@ class MainActivity : AppCompatActivity() {
     private fun fetchRepositories() {
         // Usamos la variable de clase 'apiService'
         val call = apiService.getRepos()
-
         call.enqueue(object : Callback<List<Repo>> {
             override fun onResponse(call: Call<List<Repo>>, response: Response<List<Repo>>) {
                 if (response.isSuccessful) {
@@ -109,7 +106,6 @@ class MainActivity : AppCompatActivity() {
                     showMessage("Error: $errorMessage")
                 }
             }
-
             override fun onFailure(call: Call<List<Repo>>, t: Throwable) {
                 showMessage("No se pudieron cargar los repositorios")
                 Log.e("MainActivity", "Error al cargar repositorios", t)
@@ -117,10 +113,9 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    // 4. FUNCIÓN MODIFICADA: Ahora acepta un objeto Repo para pasarlo al formulario.
+    //La funcion acepta un objeto Repo para pasarlo al formulario.
     private fun displayEditRepoForm(repo: Repo) {
         // Inicia RepoForm y le pasa el objeto 'repo' completo.
-        // Asegúrate de que tu clase 'Repo' implemente 'Serializable'.
         val intent = Intent(this, RepoForm::class.java).apply {
             putExtra("EXTRA_REPO", repo)
         }

@@ -8,7 +8,7 @@ data class Repo (
     val description: String?,
     val language: String?,
     val owner: RepoOwner
-): Serializable
+): Serializable // divide el objeto en bytes para asi poder guardar la informacion y poder cambiarla
 data class RepoRequest(
     val name: String,
     val description: String,

@@ -19,20 +19,20 @@ interface GithubApiService {
         @Query("direction") direction: String = "desc"
     ): Call<List<Repo>>
 
-    // 2. RENOMBRAMOS 'addRepo' a 'createRepo' para mayor claridad y coherencia.
+    // cambie el nombre de la funcion de addRepo a createRepo
     @POST("user/repos")
     fun createRepo( // Nombre cambiado
         @Body repoRequest: RepoRequest
     ): Call<Repo>
 
-    // 3. AÑADIMOS LA NUEVA FUNCIÓN PARA ACTUALIZAR (EDITAR)
+    // la nueva funcion para actualizar(editar) el repositorio
     @PATCH("repos/{owner}/{repo}")
     fun updateRepo(
         @Path("owner") owner: String, // El dueño del repositorio
         @Path("repo") repoName: String, // El nombre original del repositorio a editar
         @Body repoRequest: RepoRequest // Los nuevos datos (nombre, descripción, etc.)
     ): Call<Repo>
-
+    // la funcion para eliminar el repositorio
     @DELETE("repos/{owner}/{repo}")
     fun deleteRepo(
         @Path("owner") owner: String,

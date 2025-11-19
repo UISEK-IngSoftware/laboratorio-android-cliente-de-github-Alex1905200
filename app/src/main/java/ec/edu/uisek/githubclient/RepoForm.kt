@@ -24,7 +24,7 @@ class RepoForm : AppCompatActivity() {
         binding = ActivityRepoFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // --- 1. RECUPERAR EL OBJETO 'Repo' COMPLETO (no el ID) ---
+        //RECUPERAR EL OBJETO 'Repo' COMPLETO
         // MainActivity envía "EXTRA_REPO", así que lo leemos aquí.
         repoToEdit = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             intent.getSerializableExtra("EXTRA_REPO", Repo::class.java)
@@ -33,7 +33,7 @@ class RepoForm : AppCompatActivity() {
             intent.getSerializableExtra("EXTRA_REPO") as? Repo
         }
 
-        // --- 2. CONFIGURAR VISTA Y BOTONES SEGÚN EL MODO ---
+        //CONFIGURAR VISTA Y BOTONES SEGÚN EL MODO ---
         if (repoToEdit != null) {
             // Si recibimos un repo, estamos en MODO EDICIÓN.
             prepareEditMode(repoToEdit!!)
@@ -41,24 +41,22 @@ class RepoForm : AppCompatActivity() {
             // Si no, estamos en MODO CREACIÓN.
             prepareCreateMode()
         }
-
+        //sino si se aplasta el boton de cancelar se acaba
         binding.cancelButton.setOnClickListener { finish() }
     }
 
 
     private fun prepareEditMode(repo: Repo) {
         supportActionBar?.title = "Editar Repositorio"
-        // Asegúrate de que el ID del botón en activity_repo_form.xml sea 'saveButton'
         binding.saveButton.text = "Actualizar"
 
         // Llenamos el formulario con los datos del repo.
-        // Asegúrate de que los IDs de los EditText sean 'repoNameInput' y 'repoDescriptionInput'.
         binding.repoNameInput.setText(repo.name)
         binding.repoDescriptionInput.setText(repo.description)
+        //Se quita la edicion del nombre del repositorio
         binding.repoNameInput.isEnabled = false
         // Opcional: Cambiamos el color para que se vea claramente que está deshabilitado
         binding.repoNameInput.alpha = 0.5f
-
         // El botón de guardar AHORA llama a la función de actualizar.
         binding.saveButton.setOnClickListener { handleUpdate(repo) }
     }
@@ -121,6 +119,8 @@ class RepoForm : AppCompatActivity() {
             })
     }
 
+
+    //asegurarse de que el nombre del repositorio es válido antes de intentar crearlo o actualizarlo
     private fun validateForm(): Boolean {
         val repoName = binding.repoNameInput.text.toString()
         // Limpiamos errores previos.

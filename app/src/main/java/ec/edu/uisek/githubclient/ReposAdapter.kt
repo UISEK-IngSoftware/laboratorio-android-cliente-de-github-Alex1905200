@@ -7,9 +7,7 @@ import com.bumptech.glide.Glide
 import ec.edu.uisek.githubclient.databinding.FragmentRepoitemBinding
 import ec.edu.uisek.githubclient.models.Repo
 
-// --- PASO 1: SIMPLIFICAR EL VIEWHOLDER ---
 // El ViewHolder ya no necesita recibir las funciones directamente si se configuran en onBindViewHolder.
-// O, para mantener el patrón, las recibe del onCreateViewHolder, pero limpiemos el código.
 // Vamos a modificarlo para que reciba las funciones y no sean nulas.
 
 class ReposViewHolder(
@@ -42,8 +40,6 @@ class ReposViewHolder(
 }
 
 
-// --- PASO 2: LIMPIAR Y USAR CORRECTAMENTE EL ADAPTADOR ---
-
 class ReposAdapter(
     // Recibimos las funciones de clic aquí. Este es el único lugar donde deben entrar.
     private val onEditClicked: (Repo) -> Unit,
@@ -51,10 +47,6 @@ class ReposAdapter(
 ) : RecyclerView.Adapter<ReposViewHolder>() {
 
     private var repositories: List<Repo> = emptyList()
-
-    // ELIMINADAS: Estas variables son redundantes y causaban el error.
-    // var onEdit: ((Repo) -> Unit)? = null
-    // var onDelete: ((Repo) -> Unit)? = null
 
     override fun getItemCount(): Int = repositories.size
 
@@ -64,8 +56,7 @@ class ReposAdapter(
             parent,
             false
         )
-        // CORREGIDO: Pasamos las funciones del constructor al ViewHolder.
-        // Antes le estabas pasando 'onEdit' y 'onDelete', que eran null.
+        // Pasamos las funciones del constructor al ViewHolder.
         return ReposViewHolder(binding, onEditClicked, onDeleteClicked)
     }
 
