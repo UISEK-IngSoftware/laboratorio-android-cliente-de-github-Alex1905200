@@ -15,7 +15,7 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-
+/*
         // Configurar la variable de entorno desde .env
         val envFile = rootProject.file(".env")
         val githubToken = if (envFile.exists()) {
@@ -29,6 +29,8 @@ android {
         }
 
         buildConfigField("String", "GITHUB_API_TOKEN", "\"$githubToken\"")
+
+ */
     }
 
     buildTypes {
@@ -61,6 +63,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -72,4 +76,6 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 // Glide para cargar imágenes desde URLs
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
 }

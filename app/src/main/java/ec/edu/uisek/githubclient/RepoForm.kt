@@ -16,7 +16,7 @@ import retrofit2.Response
 
 class RepoForm : AppCompatActivity() {
     private lateinit var binding: ActivityRepoFormBinding
-    private val apiService: GithubApiService = RetrofitClient.gitHubApiService
+    private val apiService: GithubApiService = RetrofitClient.getApiService()
     private var repoToEdit: Repo? = null // Variable para guardar el repo si estamos editando
 
     override fun onCreate(savedInstanceState: Bundle?) {
